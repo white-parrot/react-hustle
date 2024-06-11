@@ -7,6 +7,7 @@ export default function Player() {
 
   function handleSetName(){
       setName(playerNameRef.current.value);
+      playerNameRef.current.value = '';
   }
 
   return (
