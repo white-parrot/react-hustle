@@ -1,4 +1,5 @@
 import {useRef, useState} from "react";
+import ResultModal from "./ResultModal.jsx";
 
 export default  function TimerChallenge({title, targetTime}){
     let timer = useRef();
@@ -8,6 +9,7 @@ export default  function TimerChallenge({title, targetTime}){
     function handleStartTimer(){
         timer.current = setTimeout( () => {
             setTimeExpired(true);
+            setTimerStarted(false);
         }, targetTime * 1000);
         setTimeExpired(false);
         setTimerStarted(true);
@@ -22,7 +24,7 @@ export default  function TimerChallenge({title, targetTime}){
     return (
         <section className="challenge">
             <h2>{title}</h2>
-            {timeExpired ? 'You Lost !' : ''}
+            {timeExpired && <ResultModal result='Lost' targetTime={targetTime} />}
             <p className="challenge-time">{targetTime} Second{targetTime > 1 ? 's' : ''}</p>
             <p>
                 <button onClick={timerStarted ? handleStopTimer : handleStartTimer}>
