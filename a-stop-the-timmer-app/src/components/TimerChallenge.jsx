@@ -5,33 +5,40 @@ export default  function TimerChallenge({title, targetTime}){
     let timer = useRef();
     let dialogRef = useRef();
 
-    const [timerStarted, setTimerStarted] = useState(false);
+    const [timeRemaining, setTimeRemaining] = useState(targetTime*1000);
+    const timerIsActive = timeRemaining > 0 && timeRemaining < targetTime*1000;
+
+    if(timeRemaining <= 0){
+        clearInterval(timer.current);
+        dialogRef.current.open();
+    }
+
+    function handleReset(){
+        setTimeRemaining(targetTime*1000);
+    }
 
     function handleStartTimer(){
-        timer.current = setTimeout( () => {
-            setTimerStarted(false);
-            dialogRef.current.open();
-        }, targetTime * 1000);
-        setTimerStarted(true);
+        timer.current = setInterval( () => {
+            setTimeRemaining( prevRemainingTime => prevRemainingTime - 10);
+        }, 10);
     }
 
     function handleStopTimer(){
-        clearTimeout(timer.current);
-        setTimerStarted(false);
-        // setTimeExpired(false);
+        dialogRef.current.open();
+        clearInterval(timer.current);
     }
 
     return (
         <section className="challenge">
             <h2>{title}</h2>
-            <ResultModal ref={dialogRef} result='Lost' targetTime={targetTime} />
+            <ResultModal ref={dialogRef} targetTime={targetTime} remainingTime={timeRemaining} onReset={handleReset} />
             <p className="challenge-time">{targetTime} Second{targetTime > 1 ? 's' : ''}</p>
             <p>
-                <button onClick={timerStarted ? handleStopTimer : handleStartTimer}>
-                    {timerStarted ? 'Stop Timer' : 'Start Timer'}
+                <button onClick={timerIsActive ? handleStopTimer : handleStartTimer}>
+                    {timerIsActive ? 'Stop Timer' : 'Start Timer'}
                 </button>
             </p>
-            <p>{timerStarted ? 'Time is running...' : 'Time Inactive'}</p>
+            <p>{timerIsActive ? 'Time is running...' : 'Time Inactive'}</p>
         </section>
     );
 }
