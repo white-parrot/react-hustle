@@ -22,7 +22,7 @@ export default function AvailablePlaces({onSelectPlace}) {
             } catch
                 (error) {
                 setError(error);
-            }3
+            }
         }
         fetchRecord().then();
     }, []);

@@ -5,6 +5,8 @@ import Modal from './components/Modal.jsx';
 import DeleteConfirmation from './components/DeleteConfirmation.jsx';
 import logoImg from './assets/logo.png';
 import AvailablePlaces from './components/AvailablePlaces.jsx';
+import {saveAvailablePlaces} from "./api.js";
+import ErrorTag from "./ErrorTag.jsx";
 
 function App() {
   const selectedPlace = useRef();
@@ -12,6 +14,8 @@ function App() {
   const [userPlaces, setUserPlaces] = useState([]);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  const [error, setError] = useState();
 
   function handleStartRemovePlace(place) {
     setModalIsOpen(true);
@@ -22,7 +26,12 @@ function App() {
     setModalIsOpen(false);
   }
 
-  function handleSelectPlace(selectedPlace) {
+  async function handleSelectPlace(selectedPlace) {
+    try {
+      await saveAvailablePlaces([selectedPlace, ...userPlaces]);
+    }catch (error){
+      setError(error);
+    }
     setUserPlaces((prevPickedPlaces) => {
       if (!prevPickedPlaces) {
         prevPickedPlaces = [];
@@ -33,7 +42,9 @@ function App() {
       return [selectedPlace, ...prevPickedPlaces];
     });
   }
-
+  if (error) {
+    return <ErrorTag title="Something Went Wrong :(" message={error.message} onConfirm={() => setError(undefined)}/>
+  }
   const handleRemovePlace = useCallback(async function handleRemovePlace() {
     setUserPlaces((prevPickedPlaces) =>
       prevPickedPlaces.filter((place) => place.id !== selectedPlace.current.id)
